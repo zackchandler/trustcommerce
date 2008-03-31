@@ -2,17 +2,17 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 # The following special environment variables must be set up prior to running tests:
 # 
-#   $ export TC_USERNAME=123456
-#   $ export TC_PASSWORD=password
-#   $ export TC_VAULT_PASSWORD=password
+#     $ export TC_USERNAME=123456
+#     $ export TC_PASSWORD=password
+#     $ export TC_VAULT_PASSWORD=password
 #
 # Run tests via rake:
 #
-#   $ rake test
+#     $ rake test
 #
 # Run tests via ruby:
 #
-#   $ ruby test/trustcommerce_test.rb
+#     $ ruby test/trustcommerce_test.rb
 class TrustCommerceSubscriptionTest < Test::Unit::TestCase
 
   def setup

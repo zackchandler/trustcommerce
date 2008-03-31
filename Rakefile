@@ -45,7 +45,7 @@ namespace :doc do
       strip_comments[info.comment]
     end
     
-    open('README', 'w') do |file|
+    open('README.markdown', 'w') do |file|
       file.write ERB.new(IO.read('README.erb')).result(binding)
     end
   end

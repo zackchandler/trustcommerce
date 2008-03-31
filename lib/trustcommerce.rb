@@ -8,41 +8,44 @@ require 'uri'
 # This library provides a simple interface to create, edit, delete, and query subscriptions
 # using TrustCommerce.
 #
-# == Background
+# ## Background ##
 #
 # TrustCommerce's recurring / subscription billing solution is implemented through a service
 # called [Citadel](http://www.trustcommerce.com/citadel.php).  A Citadel-enabled account is
 # required to use the subscription-based features implemented by this library.
 #
-# === Citadel Basics
+# ### Citadel Basics ###
+#
 # * Citadel stores customer profiles which can include credit card information and billing frequency.
 # * Citadel will automatically bill customers on their respective schedules.
 # * Citadel identifies each customer by a Billing ID (six-character alphanumeric string).
 # * A customer's profile, credit card, and billing frequency can be modified using the Billing ID.
 #
-# == Installation
+# ## Installation ##
 #
 # The simple way:
-#   $ sudo gem install trustcommerce
+#
+#     $ sudo gem install trustcommerce
 #
 # Directly from repository:
-#   $ svn co svn://rubyforge.org/var/svn/trustcommerce/trunk trustcommerce
+#
+#     $ svn co svn://rubyforge.org/var/svn/trustcommerce/trunk trustcommerce
 #
 # It is highly recommended to download and install the
 # [TCLink ruby extension](http://www.trustcommerce.com/tclink.php).
 # This extension provides failover capability and enhanced security features.
 # If this library is not installed, standard POST over SSL will be used.
 #
-# == Configuration
+# ## Configuration ##
 #
 # When you signup for a TrustCommerce account you are issued a custid and a password.
 # These are your credentials when using the TrustCommerce API.
 #
-#   TrustCommerce.custid   = '123456'
-#   TrustCommerce.password = 'topsecret'
+#     TrustCommerce.custid   = '123456'
+#     TrustCommerce.password = 'topsecret'
 #
-#   # optional - sets Vault password for use in query() calls
-#   TrustCommerce.vault_password = 'supersecure'
+#     # optional - sets Vault password for use in query() calls
+#     TrustCommerce.vault_password = 'supersecure'
 #
 # The password that TrustCommerce issues never changes or expires when used through the TCLink
 # extension.  However if you choose to use SSL over HTTP instead (the fallback option if the TCLink
@@ -77,78 +80,78 @@ class TrustCommerce
   
   class Subscription
 
-    #   # Bill Jennifer $12.00 monthly
-    #   response = TrustCommerce::Subscription.create(
-    #     :cc     => '4111111111111111',
-    #     :exp    => '0412',
-    #     :name   => 'Jennifer Smith',
-    #     :amount => 1200,
-    #     :cycle  => '1m'
-    #   )
-    #   
-    #   if response['status'] == 'approved'
-    #     puts "Subscription created with Billing ID: #{response['billingid']}"
-    #   else
-    #     puts "An error occurred: #{response['error']}"
-    #   end
+    #     # Bill Jennifer $12.00 monthly
+    #     response = TrustCommerce::Subscription.create(
+    #       :cc     => '4111111111111111',
+    #       :exp    => '0412',
+    #       :name   => 'Jennifer Smith',
+    #       :amount => 1200,
+    #       :cycle  => '1m'
+    #     )
+    #     
+    #     if response['status'] == 'approved'
+    #       puts "Subscription created with Billing ID: #{response['billingid']}"
+    #     else
+    #       puts "An error occurred: #{response['error']}"
+    #     end
     def self.create(options)
       return TrustCommerce.send_request(options.merge(:action => 'store'))
     end
     
-    #   # Update subscription to use new credit card
-    #   response = TrustCommerce::Subscription.update(
-    #     :billingid => 'ABC123',
-    #     :cc        => '5411111111111115', 
-    #     :exp       => '0412'
-    #   )
-    #   
-    #   if response['status'] == 'accepted'
-    #     puts 'Subscription updated.'
-    #   else
-    #     puts "An error occurred: #{response['error']}"
-    #   end
+    #     # Update subscription to use new credit card
+    #     response = TrustCommerce::Subscription.update(
+    #       :billingid => 'ABC123',
+    #       :cc        => '5411111111111115', 
+    #       :exp       => '0412'
+    #     )
+    #     
+    #     if response['status'] == 'accepted'
+    #       puts 'Subscription updated.'
+    #     else
+    #       puts "An error occurred: #{response['error']}"
+    #     end
     def self.update(options)
       return TrustCommerce.send_request(options.merge(:action => 'store'))
     end    
     
-    #   # Delete subscription
-    #   response = TrustCommerce::Subscription.delete(
-    #     :billingid => 'ABC123'
-    #   )
-    #   
-    #   if response['status'] == 'accepted'
-    #     puts 'Subscription removed from active use.'
-    #   else
-    #     puts 'An error occurred.'
-    #   end
+    #     # Delete subscription
+    #     response = TrustCommerce::Subscription.delete(
+    #       :billingid => 'ABC123'
+    #     )
+    #     
+    #     if response['status'] == 'accepted'
+    #       puts 'Subscription removed from active use.'
+    #     else
+    #       puts 'An error occurred.'
+    #     end
     def self.delete(options)
       return TrustCommerce.send_request(options.merge(:action => 'unstore'))
     end
     
-    #   # Process one-time sale against existing subscription
-    #   response = TrustCommerce::Subscription.charge(
-    #     :billingid => 'ABC123',
-    #     :amount    => 1995
-    #   )
+    #     # Process one-time sale against existing subscription
+    #     response = TrustCommerce::Subscription.charge(
+    #       :billingid => 'ABC123',
+    #       :amount    => 1995
+    #     )
     def self.charge(options)
       return TrustCommerce.send_request(options.merge(:action => 'sale'))
     end
     
-    #   # Process one-time credit against existing transaction
-    #   response = TrustCommerce::Subscription.credit(
-    #     :transid => '001-0000111101',
-    #     :amount  => 1995
-    #   )
+    #     # Process one-time credit against existing transaction
+    #     response = TrustCommerce::Subscription.credit(
+    #       :transid => '001-0000111101',
+    #       :amount  => 1995
+    #     )
     def self.credit(options)
       return TrustCommerce.send_request(options.merge(:action => 'credit'))
     end
     
-    #   # Get all sale transactions for a subscription in CSV format
-    #   response = TrustCommerce::Subscription.query(
-    #     :querytype => 'transaction',
-    #     :action    => 'sale',
-    #     :billingid => 'ABC123'
-    #   )
+    #     # Get all sale transactions for a subscription in CSV format
+    #     response = TrustCommerce::Subscription.query(
+    #       :querytype => 'transaction',
+    #       :action    => 'sale',
+    #       :billingid => 'ABC123'
+    #     )
     def self.query(options)
       return TrustCommerce.send_query(options)
     end    
