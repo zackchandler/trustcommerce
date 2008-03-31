@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+	<head>
+	<title>TrustCommerce Subscription Library</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="description" content="A Ruby library to manage subscriptions through TrustCommerce" />
+		<meta name="keywords" content="trustcommerce, trust commerce, billing, credit cards, merchant account, subscription, citadel, ruby, gem, rubyforge, library, rails, plugin, depixelate, zack chandler" />
+		<meta name="author" content="Zack Chandler" />
+		<link rel="stylesheet" type="text/css" media="screen" href="screen.css" />
+		<script type="text/javascript">
+		var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+		document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+		var pageTracker = _gat._getTracker("UA-753732-4");
+		pageTracker._initData();
+		pageTracker._trackPageview();
+		</script>
+	</head>
+	<body>
+		<div id="wrap">
+			<p><img id="logo" src="tc_ruby.gif" /></p>
+			<h1>TrustCommerce Subscription Library</h1>
+			<p id="rubyforge-links">
+				<a href="http://rubyforge.org/viewvc/?root=trustcommerce">Browse code</a> |
+	      <a href="http://trustcommerce.rubyforge.org/doc/">Docs</a> |
+	      <a href="http://rubyforge.org/frs/?group_id=3093">Downloads</a> |
+	      <a href="http://rubyforge.org/tracker/?group_id=3093">Bugs &amp; Patches</a>
+			</p>
+			<p>
+<a href="http://www.trustcommerce.com">TrustCommerce</a> is a payment gateway
+providing credit card processing and recurring / subscription billing
+services.
+</p>
+<p>
+This library provides a simple interface to create, edit, delete, and query
+subscriptions using TrustCommerce.
+</p>
+<h2>Background</h2>
+<p>
+TrustCommerce&#8217;s recurring / subscription billing solution is
+implemented through a service called
+<a href="http://www.trustcommerce.com/citadel.php">Citadel</a>. A Citadel-enabled
+account is required to use the subscription-based features implemented by
+this library.
+</p>
+<h3>Citadel Basics</h3>
+<ul>
+<li>Citadel stores customer profiles which can include credit card information
+and billing frequency.
+
+</li>
+<li>Citadel will automatically bill customers on their respective schedules.
+
+</li>
+<li>Citadel identifies each customer by a Billing ID (six-character
+alphanumeric string).
+
+</li>
+<li>A customer&#8217;s profile, credit card, and billing frequency can be
+modified using the Billing ID.
+
+</li>
+</ul>
+<h2>Installation</h2>
+<p>
+The simple way:
+</p>
+<div class="ruby"><pre>  <span class="global">$ </span><span class="ident">sudo</span> <span class="ident">gem</span> <span class="ident">install</span> <span class="ident">trustcommerce</span>
+</pre></div><p>
+Directly from repository:
+</p>
+<div class="ruby"><pre>  <span class="global">$ </span><span class="ident">svn</span> <span class="ident">co</span> <span class="ident">svn</span><span class="punct">:/</span><span class="regex"></span><span class="punct">/</span><span class="ident">rubyforge</span><span class="punct">.</span><span class="ident">org</span><span class="punct">/</span><span class="ident">var</span><span class="punct">/</span><span class="ident">svn</span><span class="punct">/</span><span class="ident">trustcommerce</span><span class="punct">/</span><span class="ident">trunk</span> <span class="ident">trustcommerce</span>
+</pre></div><p>
+It is highly recommended to download and install the <a href="http://www.trustcommerce.com/tclink.php">TCLink ruby
+extension</a>. This extension
+provides failover capability and enhanced security features. If this
+library is not installed, standard POST over SSL will be used.
+</p>
+<h2>Configuration</h2>
+<p>
+When you signup for a TrustCommerce account you are issued a custid and a
+password. These are your credentials when using the TrustCommerce API.
+</p>
+<div class="ruby"><pre>  <span class="constant">TrustCommerce</span><span class="punct">.</span><span class="ident">custid</span>   <span class="punct">=</span> <span class="punct">'</span><span class="string">123456</span><span class="punct">'</span>
+  <span class="constant">TrustCommerce</span><span class="punct">.</span><span class="ident">password</span> <span class="punct">=</span> <span class="punct">'</span><span class="string">topsecret</span><span class="punct">'</span>
+
+  <span class="comment"># optional - sets Vault password for use in query() calls</span>
+  <span class="constant">TrustCommerce</span><span class="punct">.</span><span class="ident">vault_password</span> <span class="punct">=</span> <span class="punct">'</span><span class="string">supersecure</span><span class="punct">'</span>
+</pre></div><p>
+The password that TrustCommerce issues never changes or expires when used
+through the TCLink extension. However if you choose to use SSL over HTTP
+instead (the fallback option if the TCLink library is not installed), be
+aware that you need to set the password to your Vault password. Likewise,
+if your application uses the query() method you must set the
+vault_password. The reason is that TrustCommerce currently routes these
+query() calls through the vault and therefore your password must be set
+accordingly. To make matters more complicated, TrustCommerce currently
+forces you to change the Vault password every 90 days.
+</p>
+<h2>Examples</h2>
+<h3>Creating a subscription</h3>
+<div class="ruby"><pre>  <span class="comment"># Bill Jennifer $12.00 monthly</span>
+  <span class="ident">response</span> <span class="punct">=</span> <span class="constant">TrustCommerce</span><span class="punct">::</span><span class="constant">Subscription</span><span class="punct">.</span><span class="ident">create</span><span class="punct">(</span>
+    <span class="symbol">:cc</span>     <span class="punct">=&gt;</span> <span class="punct">'</span><span class="string">4111111111111111</span><span class="punct">',</span>
+    <span class="symbol">:exp</span>    <span class="punct">=&gt;</span> <span class="punct">'</span><span class="string">0412</span><span class="punct">',</span>
+    <span class="symbol">:name</span>   <span class="punct">=&gt;</span> <span class="punct">'</span><span class="string">Jennifer Smith</span><span class="punct">',</span>
+    <span class="symbol">:amount</span> <span class="punct">=&gt;</span> <span class="number">1200</span><span class="punct">,</span>
+    <span class="symbol">:cycle</span>  <span class="punct">=&gt;</span> <span class="punct">'</span><span class="string">1m</span><span class="punct">'</span>
+  <span class="punct">)</span>
+
+  <span class="keyword">if</span> <span class="ident">response</span><span class="punct">['</span><span class="string">status</span><span class="punct">']</span> <span class="punct">==</span> <span class="punct">'</span><span class="string">approved</span><span class="punct">'</span>
+    <span class="ident">puts</span> <span class="punct">&quot;</span><span class="string">Subscription created with Billing ID: <span class="expr">#{response['billingid']}</span></span><span class="punct">&quot;</span>
+  <span class="keyword">else</span>
+    <span class="ident">puts</span> <span class="punct">&quot;</span><span class="string">An error occurred: <span class="expr">#{response['error']}</span></span><span class="punct">&quot;</span>
+  <span class="keyword">end</span>
+</pre></div><h3>Update a subscription</h3>
+<div class="ruby"><pre>  <span class="comment"># Update subscription to use new credit card</span>
+  <span class="ident">response</span> <span class="punct">=</span> <span class="constant">TrustCommerce</span><span class="punct">::</span><span class="constant">Subscription</span><span class="punct">.</span><span class="ident">update</span><span class="punct">(</span>
+    <span class="symbol">:billingid</span> <span class="punct">=&gt;</span> <span class="punct">'</span><span class="string">ABC123</span><span class="punct">',</span>
+    <span class="symbol">:cc</span>        <span class="punct">=&gt;</span> <span class="punct">'</span><span class="string">5411111111111115</span><span class="punct">',</span>
+    <span class="symbol">:exp</span>       <span class="punct">=&gt;</span> <span class="punct">'</span><span class="string">0412</span><span class="punct">'</span>
+  <span class="punct">)</span>
+
+  <span class="keyword">if</span> <span class="ident">response</span><span class="punct">['</span><span class="string">status</span><span class="punct">']</span> <span class="punct">==</span> <span class="punct">'</span><span class="string">accepted</span><span class="punct">'</span>
+    <span class="ident">puts</span> <span class="punct">'</span><span class="string">Subscription updated.</span><span class="punct">'</span>
+  <span class="keyword">else</span>
+    <span class="ident">puts</span> <span class="punct">&quot;</span><span class="string">An error occurred: <span class="expr">#{response['error']}</span></span><span class="punct">&quot;</span>
+  <span class="keyword">end</span>
+</pre></div><h3>Delete a subscription</h3>
+<div class="ruby"><pre>  <span class="comment"># Delete subscription</span>
+  <span class="ident">response</span> <span class="punct">=</span> <span class="constant">TrustCommerce</span><span class="punct">::</span><span class="constant">Subscription</span><span class="punct">.</span><span class="ident">delete</span><span class="punct">(</span>
+    <span class="symbol">:billingid</span> <span class="punct">=&gt;</span> <span class="punct">'</span><span class="string">ABC123</span><span class="punct">'</span>
+  <span class="punct">)</span>
+
+  <span class="keyword">if</span> <span class="ident">response</span><span class="punct">['</span><span class="string">status</span><span class="punct">']</span> <span class="punct">==</span> <span class="punct">'</span><span class="string">accepted</span><span class="punct">'</span>
+    <span class="ident">puts</span> <span class="punct">'</span><span class="string">Subscription removed from active use.</span><span class="punct">'</span>
+  <span class="keyword">else</span>
+    <span class="ident">puts</span> <span class="punct">'</span><span class="string">An error occurred.</span><span class="punct">'</span>
+  <span class="keyword">end</span>
+</pre></div><h3>Query a subscription</h3>
+<div class="ruby"><pre>  <span class="comment"># Get all sale transactions for a subscription in CSV format</span>
+  <span class="ident">response</span> <span class="punct">=</span> <span class="constant">TrustCommerce</span><span class="punct">::</span><span class="constant">Subscription</span><span class="punct">.</span><span class="ident">query</span><span class="punct">(</span>
+    <span class="symbol">:querytype</span> <span class="punct">=&gt;</span> <span class="punct">'</span><span class="string">transaction</span><span class="punct">',</span>
+    <span class="symbol">:action</span>    <span class="punct">=&gt;</span> <span class="punct">'</span><span class="string">sale</span><span class="punct">',</span>
+    <span class="symbol">:billingid</span> <span class="punct">=&gt;</span> <span class="punct">'</span><span class="string">ABC123</span><span class="punct">'</span>
+  <span class="punct">)</span>
+</pre></div><h3>Process a one-time charge</h3>
+<div class="ruby"><pre>  <span class="comment"># Process one-time sale against existing subscription</span>
+  <span class="ident">response</span> <span class="punct">=</span> <span class="constant">TrustCommerce</span><span class="punct">::</span><span class="constant">Subscription</span><span class="punct">.</span><span class="ident">charge</span><span class="punct">(</span>
+    <span class="symbol">:billingid</span> <span class="punct">=&gt;</span> <span class="punct">'</span><span class="string">ABC123</span><span class="punct">',</span>
+    <span class="symbol">:amount</span>    <span class="punct">=&gt;</span> <span class="number">1995</span>
+  <span class="punct">)</span>
+</pre></div><h3>Credit a transaction</h3>
+<div class="ruby"><pre>  <span class="comment"># Process one-time credit against existing transaction</span>
+  <span class="ident">response</span> <span class="punct">=</span> <span class="constant">TrustCommerce</span><span class="punct">::</span><span class="constant">Subscription</span><span class="punct">.</span><span class="ident">credit</span><span class="punct">(</span>
+    <span class="symbol">:transid</span> <span class="punct">=&gt;</span> <span class="punct">'</span><span class="string">001-0000111101</span><span class="punct">',</span>
+    <span class="symbol">:amount</span>  <span class="punct">=&gt;</span> <span class="number">1995</span>
+  <span class="punct">)</span>
+</pre></div><h2>Running the tests</h2>
+<p>
+The following special environment variables must be set up prior to running
+tests:
+</p>
+<div class="ruby"><pre>  <span class="global">$ </span><span class="ident">export</span> <span class="constant">TC_USERNAME</span><span class="punct">=</span><span class="number">123456</span>
+  <span class="global">$ </span><span class="ident">export</span> <span class="constant">TC_PASSWORD</span><span class="punct">=</span><span class="ident">password</span>
+  <span class="global">$ </span><span class="ident">export</span> <span class="constant">TC_VAULT_PASSWORD</span><span class="punct">=</span><span class="ident">password</span>
+</pre></div><p>
+Run tests via rake:
+</p>
+<div class="ruby"><pre>  <span class="global">$ </span><span class="ident">rake</span> <span class="ident">test</span>
+</pre></div><p>
+Run tests via ruby:
+</p>
+<div class="ruby"><pre>  <span class="global">$ </span><span class="ident">ruby</span> <span class="ident">test</span><span class="punct">/</span><span class="ident">trustcommerce_test</span><span class="punct">.</span><span class="ident">rb</span>
+</pre></div>
+			<div id="footer">
+				By <a href="http://depixelate.com">Zack Chandler</a>
+			</div>
+		</div>
+	</body>
+</html>

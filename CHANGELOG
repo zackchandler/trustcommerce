@@ -1,0 +1,17 @@
+trunk:
+
+0.5.3:
+
+Fixed small typo in statuses: defined should be decline [Ara Vartanian <avartanian@postful-inc.com>]
+
+0.5.2:
+
+Add TrustcommerceSyncAgent as example code on how to sync transactions with the Vault.
+
+0.5.1:
+
+Return responses as a Result class (smarter Hash) to allow stuff like: response.accepted? [Carl Lerche <carl.lerche@verizon.net>]
+
+0.5.0:
+
+- Initial public release

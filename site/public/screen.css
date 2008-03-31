@@ -1,0 +1,85 @@
+body {
+	margin: 0;
+	padding: 8px 0 0 0;
+	font-family: Verdana, sans-serif;
+	font-size: small;
+	color: #333;
+}
+
+a:link, a:visited {
+	color: #00f;
+	text-decoration: none;
+	border-bottom: 1px solid #C0C0FF;
+}
+a:hover {
+	color: #8080FF;
+	border-bottom: 1px solid #8080FF;
+}
+
+#wrap {
+	width: 700px;
+	margin: 30px auto;
+	padding: 0;
+	font-size: 95%;
+	line-height: 1.6em;
+}
+#footer {
+	margin-top: 25px;
+	text-align: center;
+}
+
+h1, h2, h3 {
+	margin: 0;
+	padding: 0;
+	letter-spacing: 0;
+	line-height: 1.2em;
+}
+
+h1 {
+	font-family: Georgia, serif;
+	font-weight: normal;
+	font-size: 250%;
+	color: #555;
+}
+h2 {
+	margin-top: 1em;
+	font-size: 175%;
+}
+h3 { 
+	margin: 1em 0 .3em 0;
+	font-size: 115%; 
+}
+
+pre {
+	margin: 0;
+	padding: 0;
+	font-family: Monaco, monospace;
+}
+
+p#rubyforge-links {
+	margin: 0 0 1em 0;
+	padding: 0 0 5px 0;
+	border-bottom: 1px solid #dcdcdc;
+}
+
+p#rubyforge-links a:link, 
+p#rubyforge-links a:visited {
+	font-weight: bold;
+	border-bottom: none;
+}
+p#rubyforge-links a:hover {
+	color: #00f;
+	font-weight: bold;
+	border-bottom: 1px solid #00f;
+}
+
+div.ruby {
+	padding: 5px;
+	background: #f5f5f5;
+	border: 1px solid #ccc;
+}
+
+div.ruby span.comment		{ color: #0066bb; }
+div.ruby span.constant	{ color: #6666FF; }
+div.ruby span.symbol 		{ color: #771100; }
+div.ruby span.string 		{ color: #008800; }
