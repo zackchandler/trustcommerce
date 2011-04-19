@@ -1,7 +1,7 @@
-require File.join(File.dirname(__FILE__), 'test_helper')
+require File.expand_path("../test_helper", __FILE__)
 
 # The following special environment variables must be set up prior to running tests:
-# 
+#
 #     $ export TC_USERNAME=123456
 #     $ export TC_PASSWORD=password
 #     $ export TC_VAULT_PASSWORD=password
@@ -30,30 +30,30 @@ class TrustCommerceSubscriptionTest < Test::Unit::TestCase
   def test_subscription_create
     via_tclink_and_https do
       response = TrustCommerce::Subscription.create(
-        :cc       => CARDS[:visa][:cc], 
-        :exp      => CARDS[:visa][:exp], 
+        :cc       => CARDS[:visa][:cc],
+        :exp      => CARDS[:visa][:exp],
         :address1 => CARDS[:visa][:address],
         :zip      => CARDS[:visa][:zip],
         :avs      => 'y',
         :name     => 'Jennifer Smith - create() test',
-      	:amount   => 1200,
-      	:cycle    => '1m',
+        :amount   => 1200,
+        :cycle    => '1m',
         :demo     => 'y'
       )
       assert_equal TrustCommerce::Result, response.class
       assert_not_nil response[:billingid]
       assert response.keys.include?(:transid)
-      assert_equal 'approved', response[:status]  
+      assert_equal 'approved', response[:status]
       assert response.approved?
     end
   end
-  
+
   def test_subscription_update
     via_tclink_and_https do
       billing_id = create_subscription!('update() test')
       response = TrustCommerce::Subscription.update(
         :billingid => billing_id,
-        :cc        => CARDS[:mastercard][:cc], 
+        :cc        => CARDS[:mastercard][:cc],
         :exp       => CARDS[:mastercard][:exp],
         :address1  => CARDS[:mastercard][:address],
         :zip       => CARDS[:mastercard][:zip],
@@ -63,7 +63,7 @@ class TrustCommerceSubscriptionTest < Test::Unit::TestCase
       assert response.accepted?
     end
   end
-  
+
   def test_subscription_delete
     via_tclink_and_https do
       billing_id = create_subscription!('delete() test')
@@ -75,11 +75,11 @@ class TrustCommerceSubscriptionTest < Test::Unit::TestCase
       assert response.accepted?
     end
   end
-  
+
   def test_subscription_charge_and_credit
-    via_tclink_and_https do    
+    via_tclink_and_https do
       billing_id = create_subscription!('charge and credit() test')
-      
+
       # charge
       charge_response = TrustCommerce::Subscription.charge(
         :billingid  => billing_id,
@@ -89,7 +89,7 @@ class TrustCommerceSubscriptionTest < Test::Unit::TestCase
       assert charge_response.keys.include?(:transid)
       assert_equal 'approved', charge_response[:status]
       assert charge_response.approved?
-    
+
       # credit
       credit_response = TrustCommerce::Subscription.credit(
         :transid  => charge_response[:transid],
@@ -101,14 +101,14 @@ class TrustCommerceSubscriptionTest < Test::Unit::TestCase
       assert credit_response.accepted?
     end
   end
-  
+
   def test_subscription_query
     puts "\n"
     puts "---------------------------------------------------------------------------"
     puts "IMPORTANT: This query test will likely take between 1 and 2 minutes!"
     puts "Make sure TC_VAULT_PASSWORD is set if it differs from your TCLink password."
     puts "---------------------------------------------------------------------------"
-    
+
     # create subscription
     billing_id = create_subscription!('query() test')
 
@@ -123,7 +123,7 @@ class TrustCommerceSubscriptionTest < Test::Unit::TestCase
         sleep(15)
       else
         puts 'Transaction found.'
-        
+
         # setup index hash
         field_names = query_response.body.split("\n")[0].split(',')
         date_line_1 = query_response.body.split("\n")[1].split(',')
@@ -137,7 +137,7 @@ class TrustCommerceSubscriptionTest < Test::Unit::TestCase
       end
     end
   end
-  
+
   # test private helpers
   def test_stringify_hash
     assert_equal ({ 'a' => '1', 'b' => '2' }),  TrustCommerce.stringify_hash(:a => '1', :b => '2')
@@ -150,5 +150,5 @@ class TrustCommerceSubscriptionTest < Test::Unit::TestCase
     assert_equal ({ :a => '1', :b => '2' }),  TrustCommerce.symbolize_hash(:a => 1, 'b' => 2)
     assert_equal 1, TrustCommerce.symbolize_hash(:a => 1, 'a' => 2).size
   end
-  
+
 end
