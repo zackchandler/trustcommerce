@@ -208,7 +208,6 @@ class TrustCommerce
       if tclink? # use TCLink extension if installed
         return Result.new(symbolize_hash(TCLink.send(parameters)))
       else # TCLink library not installed - use https post
-        parameters[:password] = self.vault_password.to_s
         response = send_https_request(API_SETTINGS[:trans_path], parameters)
 
         # parse response
